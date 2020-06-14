@@ -33,20 +33,43 @@ const mostBlogs = (blogs) => {
     if (blogs.length === 0) {
         return 0
     }
-    const authorsArray = blogs.map(blog => blog.author)
+    const authorsArray = blogs.map(blog => blog.author.toUpperCase())
 
     const authorAndNumberOfBlogs = _.countBy(authorsArray)
-    const authorWithHighestBlogs = _.maxBy(_.keys(authorAndNumberOfBlogs), function (f) {
+    const authorWithHighestBlogs = _.maxBy(_.keys(authorAndNumberOfBlogs), function (o) {
 
-        return authorAndNumberOfBlogs[f]
+        return authorAndNumberOfBlogs[o]
     })
-    console.log(authorAndNumberOfBlogs)
-    console.log('Author with highest blogs', authorWithHighestBlogs)
+
     const numberOfBlogs = _.values(authorAndNumberOfBlogs)
     const highestValue = Math.max(...numberOfBlogs)
-    console.log('Highest Value', highestValue)
 
     return { author: authorWithHighestBlogs, blogs: highestValue }
+}
+
+const mostLikes = (blogs) => {
+    if (blogs.length === 0) {
+        return 0
+    }
+
+    const authorAndLikesArray = Object.values(blogs.map(({ author, likes }) => ({
+        author, likes
+    })).reduce(function (l, a) {
+        const key = a.author
+        if (!l[key]) {
+            console.log('Not l[key] is:', !l[key])
+            l[key] = a
+            console.log('a is:', a)
+        } else {
+            console.log('l[key] is:', l[key])
+            l[key].likes += a.likes
+        }
+        return l
+    }, {}))
+  
+    const authorWithLargestLikes = _.maxBy(authorAndLikesArray, 'likes')
+
+    return authorWithLargestLikes
 }
 
 module.exports = {
@@ -54,4 +77,5 @@ module.exports = {
     totalLikes,
     favoriteBlog,
     mostBlogs,
+    mostLikes,
 }
