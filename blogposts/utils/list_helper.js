@@ -57,11 +57,8 @@ const mostLikes = (blogs) => {
     })).reduce(function (l, a) {
         const key = a.author
         if (!l[key]) {
-            console.log('Not l[key] is:', !l[key])
             l[key] = a
-            console.log('a is:', a)
         } else {
-            console.log('l[key] is:', l[key])
             l[key].likes += a.likes
         }
         return l
