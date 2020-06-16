@@ -16,84 +16,163 @@ beforeEach(async () => {
     await Promise.all(promiseArray)
 })
 
-test('blogs are returned as json', async () => {
-    await api
-        .get('/api/blogs')
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
+describe('when there is initially some blogs saved', () => {
+
+    test('blogs are returned as json', async () => {
+        await api
+            .get('/api/blogs')
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+    })
+
+    test('all blogs are returned', async () => {
+        const response = await api.get('/api/blogs')
+        expect(response.body).toHaveLength(helper.initialBlogs.length)
+    })
+
+    test('the unique identifier property of blog post is named id', async () => {
+        const response = await api.get('/api/blogs')
+        const blogs = response.body
+
+        if (blogs.length !== 0)
+            expect(blogs[0].id).toBeDefined()
+    })
 })
 
-test('the unique identifier property of blog posts is named id', async () => {
-    const response = await api.get('/api/blogs')
-    const blogs = response.body
 
-    if (blogs.length !== 0)
-        expect(blogs[0].id).toBeDefined()
+describe('addition of a new blog post', () => {
+
+    test('succeeds with a valid data', async () => {
+        const newBlog = {
+            title: 'The uneven way to paradise',
+            author: 'Ben Forster',
+            url: 'www.benforster.com',
+            likes: 8,
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        const blogsAtEnd = await helper.blogsInDb()
+        expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
+
+        const titleArray = blogsAtEnd.map(b => b.title)
+        expect(titleArray).toContain(
+            'The uneven way to paradise'
+        )
+    })
+
+    test('when likes is undefined succeeds with likes taking a default value of 0', async () => {
+        const newBlog = {
+            title: 'Travelling through the nights',
+            author: 'Adam Benky',
+            url: 'www.adambenky.com',
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        const blogsAtEnd = await helper.blogsInDb()
+        expect(blogsAtEnd).toHaveLength(
+            helper.initialBlogs.length + 1)
+
+        const titleArray = blogsAtEnd.map(b => b.title)
+        expect(titleArray).toContain(
+            'Travelling through the nights'
+        )
+
+        const likesArray = blogsAtEnd.map(b => b.likes)
+        expect(likesArray[likesArray.length - 1]).toBe(0)
+    })
+
+    test('fails with status code 400 if data is invalid', async () => {
+        const newBlog = {
+            author: 'Blank Wood',
+            likes: 2
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(400)
+
+        const blogsAtEnd = await helper.blogsInDb()
+
+        expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+    })
 })
 
-test('a valid blog can be added', async () => {
-    const newBlog = {
-        title: 'The uneven way to paradise',
-        author: 'Ben Forster',
-        url: 'www.benforster.com',
-        likes: 8,
-    }
+describe('deletion of a blog post', () => {
+    test('succeeds with status code 204 if id is valid and the blog exists', async () => {
+        const blogsAtStart = await helper.blogsInDb()
+        const blogToDelete = blogsAtStart[0]
 
-    await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(204)
 
-    const blogsAtEnd = await helper.blogsInDb()
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
+        const blogsAtEnd = await helper.blogsInDb()
 
-    const titleArray = blogsAtEnd.map(b => b.title)
-    expect(titleArray).toContain(
-        'The uneven way to paradise'
-    )
+        expect(blogsAtEnd).toHaveLength(
+            helper.initialBlogs.length - 1
+        )
+
+        const contents = blogsAtEnd.map(r => r.title)
+
+        expect(contents).not.toContain(blogToDelete.title)
+    })
+
+    test('succeeds/fails with status code 404 if id is valid but blog does not exist', async () => {
+        const validNonexistingId = await helper.nonExistingId()
+
+        await api
+            .delete(`/api/blogs/${validNonexistingId}`)
+            .expect(404)
+    })
 })
 
-test('a valid blog without the likes specified can be added', async () => {
-    const newBlog = {
-        title: 'Travelling through the nights',
-        author: 'Adam Benky',
-        url: 'www.adambenky.com',
-    }
+describe('updating a specific blog', () => {
+    test('succeeds when the blog exists and have a valid id', async () => {
+        const updateValue = {
+            likes: 20,
+        }
+        const blogsAtStart = await helper.blogsInDb()
 
-    await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
+        const blogToUpdate = blogsAtStart[0]
+        console.log(blogsAtStart, blogToUpdate)
 
-    const blogsAtEnd = await helper.blogsInDb()
-    expect(blogsAtEnd).toHaveLength(
-        helper.initialBlogs.length + 1)
+        const resultBlog = await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .send(updateValue)
+            .expect(204)
 
-    const titleArray = blogsAtEnd.map(b => b.title)
-    expect(titleArray).toContain(
-        'Travelling through the nights'
-    )
+        const blogsAtEnd = await helper.blogsInDb()
+        console.log(blogsAtEnd, blogsAtEnd[0], blogsAtEnd[0].title, blogsAtEnd[0].likes, updateValue.likes)
 
-    const likesArray = blogsAtEnd.map(b => b.likes)
-    expect(likesArray[likesArray.length - 1]).toBe(0)
-})
+        expect(updateValue.likes).toBe(blogsAtEnd[0].likes)
+    })
 
-test('blog without title and url is not added', async () => {
-    const newBlog = {
-        author: 'Blank Wood',
-        likes: 2
-    }
+    test('fails with status code 404 if blog does not exist', async () => {
+        const validNonexistingId = await helper.nonExistingId()
 
-    await api
-        .post('/api/blogs')
-        .send(newBlog)
+        await api
+            .put(`/api/blogs/${validNonexistingId}`)
+            .expect(404)
+    })
+
+    test('fails with status code 400 if the id is not valid', async () => {
+        const invalidId = '23dferth456dfg45rtf678f'
+
+        await api
+        .put(`/api/blogs/${invalidId}`)
         .expect(400)
-
-    const blogsAtEnd = await helper.blogsInDb()
-
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+    })
 })
 
 afterAll(() => {
