@@ -145,7 +145,6 @@ describe('updating a specific blog', () => {
         const blogsAtStart = await helper.blogsInDb()
 
         const blogToUpdate = blogsAtStart[0]
-        console.log(blogsAtStart, blogToUpdate)
 
         const resultBlog = await api
             .put(`/api/blogs/${blogToUpdate.id}`)
@@ -153,7 +152,6 @@ describe('updating a specific blog', () => {
             .expect(204)
 
         const blogsAtEnd = await helper.blogsInDb()
-        console.log(blogsAtEnd, blogsAtEnd[0], blogsAtEnd[0].title, blogsAtEnd[0].likes, updateValue.likes)
 
         expect(updateValue.likes).toBe(blogsAtEnd[0].likes)
     })
@@ -170,8 +168,8 @@ describe('updating a specific blog', () => {
         const invalidId = '23dferth456dfg45rtf678f'
 
         await api
-        .put(`/api/blogs/${invalidId}`)
-        .expect(400)
+            .put(`/api/blogs/${invalidId}`)
+            .expect(400)
     })
 })
 
