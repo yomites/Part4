@@ -1,8 +1,8 @@
-POST  http://localhost:3003/api/users
+POST  http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "username": "sa",
-    "name": "Tim Morris",
-    "password": "saaaa"
+    "title": "A complete guide to useEffect",
+    "author": "Dan Abramov",
+    "url": "https://overreacted.io/a-complete-guide-to-useeffect/#each-render-has-its-own-props-and-state"
 }
