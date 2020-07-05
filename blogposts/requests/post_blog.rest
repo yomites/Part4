@@ -1,8 +1,9 @@
 POST  http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlbGxhcyIsImlkIjoiNWVlZWZlMzBjYTBhNjgxMGUwYmY1ZDM1IiwiaWF0IjoxNTkzOTM3MzM3fQ.u7ev9WFW2DsLszPpvDHxDbNMZrRkPCTWixnvktkwGcg
 
 {
-    "title": "A complete guide to useEffect",
-    "author": "Dan Abramov",
-    "url": "https://overreacted.io/a-complete-guide-to-useeffect/#each-render-has-its-own-props-and-state"
+    "title": "This is Function Calls",
+    "author": "Marius Schulz",
+    "url": "https://egghead.io/lessons/javascript-this-in-function-calls"
 }
