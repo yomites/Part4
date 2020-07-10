@@ -3,7 +3,7 @@ Content-Type: application/json
 Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvbGx5IiwiaWQiOiI1ZjAwY2I1NjAxNGY4MTE3ZjRkZjhiNGYiLCJpYXQiOjE1OTQxMjIyODl9.Pjp_cIxsBZj6YcyWEHr0Vp0Ijp16JDr0uHHjVLa_xTU
 
 {
-    "title": "Three Projects to Make You a Better Programmer",
-    "author": "Giuseppe Picciano",
-    "url": "https://medium.com/the-dev-caf%C3%A9/three-projects-to-make-you-a-better-programmer-65903e53620a"
+    "title": "Tracing user interactions with React",
+    "author": "Kent C. Dodds",
+    "url": "https://kentcdodds.com/blog/tracing-user-interactions-with-react"
 }
