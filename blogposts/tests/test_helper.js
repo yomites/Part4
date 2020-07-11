@@ -5,7 +5,7 @@ const initialBlogs = [
     {
         title: "HTML is easy",
         author: "Ben Morrisson",
-        url: "http:mybusiness.com",
+        url: "http://mybusiness.com",
         likes: 5,
     },
     {
@@ -14,6 +14,13 @@ const initialBlogs = [
         url: "www.kanayo.com",
         likes: 4,
     },
+    {
+        title: "Power of Javascript",
+        author: "Matti Kauninen",
+        url: "www.javascript.com",
+        likes: 25,
+        user: "5f0a007bb3a0534e38fa0433"
+    }
 ]
 
 const blogsInDb = async () => {

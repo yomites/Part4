@@ -2,10 +2,11 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const helper = require('./test_helper')
 const app = require('../app')
-//const blog = require('../models/blog')
 const api = supertest(app)
 const Blog = require('../models/blog')
 
+const authorization = 'authorization'
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlbGxhcyIsImlkIjoiNWYwYTAwN2JiM2EwNTM0ZTM4ZmEwNDMzIiwiaWF0IjoxNTk0NDkxOTExfQ.VIstT8Q5f5gXjQF_GewcCPM-p8Ugs5NTvVy0OrhVKlk'
 
 beforeEach(async () => {
     await Blog.deleteMany({})
@@ -39,7 +40,6 @@ describe('when there is initially some blogs saved', () => {
     })
 })
 
-
 describe('addition of a new blog post', () => {
 
     test('succeeds with a valid data', async () => {
@@ -52,6 +52,7 @@ describe('addition of a new blog post', () => {
 
         await api
             .post('/api/blogs')
+            .set(authorization, `bearer ${token}`)
             .send(newBlog)
             .expect(200)
             .expect('Content-Type', /application\/json/)
@@ -75,6 +76,7 @@ describe('addition of a new blog post', () => {
         await api
             .post('/api/blogs')
             .send(newBlog)
+            .set(authorization, `bearer ${token}`)
             .expect(200)
             .expect('Content-Type', /application\/json/)
 
@@ -91,14 +93,35 @@ describe('addition of a new blog post', () => {
         expect(likesArray[likesArray.length - 1]).toBe(0)
     })
 
-    test('fails with status code 400 if data is invalid', async () => {
+    test('fails with status code 401 if token is not provided or invalid', async () => {
         const newBlog = {
+            title: 'Bear with me',
             author: 'Blank Wood',
+            url: 'www.bearwithme.com',
             likes: 2
         }
 
         await api
             .post('/api/blogs')
+            .set(authorization, `bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhlbGxhcyIsImlkIjoiNWYwYTAwN2JiM2EwNTM0ZTM4ZmEwNDMzIiwiaWF0IjoxNTk0NDkxOTExfQ.VIstT8Q5f5gXjQF_GewcCPM-p8Ugs5NTvVy0OrhV`)
+            .send(newBlog)
+            .expect(401)
+
+        const blogsAtEnd = await helper.blogsInDb()
+
+        expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+    })
+
+    test('fails with status code 400 if data is invalid and the correct token is provided', async () => {
+        const newBlog = {
+            author: 'Blank Wood',
+            url: 'www.bearwithme.com',
+            likes: 2
+        }
+
+        await api
+            .post('/api/blogs')
+            .set(authorization, `bearer ${token}`)
             .send(newBlog)
             .expect(400)
 
@@ -111,10 +134,11 @@ describe('addition of a new blog post', () => {
 describe('deletion of a blog post', () => {
     test('succeeds with status code 204 if id is valid and the blog exists', async () => {
         const blogsAtStart = await helper.blogsInDb()
-        const blogToDelete = blogsAtStart[0]
+        const blogToDelete = blogsAtStart[2]
 
         await api
             .delete(`/api/blogs/${blogToDelete.id}`)
+            .set(authorization, `bearer ${token}`)
             .expect(204)
 
         const blogsAtEnd = await helper.blogsInDb()
@@ -133,6 +157,7 @@ describe('deletion of a blog post', () => {
 
         await api
             .delete(`/api/blogs/${validNonexistingId}`)
+            .set(authorization, `bearer ${token}`)
             .expect(404)
     })
 })

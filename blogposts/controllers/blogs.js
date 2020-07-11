@@ -4,7 +4,7 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 
 blogsRouter.get('/', async (request, response) => {
-    
+
     const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
     response.json(blogs.map(blog => blog.toJSON()))
 })
@@ -13,6 +13,7 @@ blogsRouter.post('/', async (request, response) => {
 
     const body = request.body
     const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    console.log('decoded token', decodedToken)
 
     if (!request.token || !decodedToken.id) {
         return response.status(401).json({ error: 'token missing or invalid' })
@@ -50,7 +51,7 @@ blogsRouter.delete('/:id', async (request, response) => {
     } else if (!blog) {
         response.status(404).send('The data is already deleted from server')
     } else {
-        response.status(401).end()
+        response.status(400).send('Bad request')
     }
 })
 
