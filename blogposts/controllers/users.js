@@ -3,31 +3,31 @@ const usersRouter = require('express').Router()
 const User = require('../models/user')
 
 usersRouter.post('/', async (request, response) => {
-    const body = request.body
+  const body = request.body
 
-    if (body.password === undefined || body.password.length < 3) {
-        console.log(`Bad request. Password ${body.password} is shorter than the minimum required length(3)`)
-        return response.status(400).json({ error: `password is empty or shorter than the minimum required length(3)` })
-    }
+  if (body.password === undefined || body.password.length < 3) {
+    console.log(`Bad request. Password ${body.password} is shorter than the minimum required length(3)`)
+    return response.status(400).json({ error: 'password is empty or shorter than the minimum required length(3)' })
+  }
 
-    const saltRounds = 10
-    const passwordHash = await bcrypt.hash(body.password, saltRounds)
+  const saltRounds = 10
+  const passwordHash = await bcrypt.hash(body.password, saltRounds)
 
-    const user = new User({
-        username: body.username,
-        name: body.name,
-        passwordHash,
-    })
+  const user = new User({
+    username: body.username,
+    name: body.name,
+    passwordHash,
+  })
 
-    const savedUser = await user.save()
+  const savedUser = await user.save()
 
-    response.json(savedUser)
+  response.json(savedUser)
 })
 
 usersRouter.get('/', async (request, response) => {
-    const users = await User.find({}).populate('blogs')
+  const users = await User.find({}).populate('blogs')
 
-    response.json(users.map(u => u.toJSON()))
+  response.json(users.map(u => u.toJSON()))
 })
 
 module.exports = usersRouter

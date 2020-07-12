@@ -1,6 +1,6 @@
 POST  http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRvbGx5IiwiaWQiOiI1ZjAwY2I1NjAxNGY4MTE3ZjRkZjhiNGYiLCJpYXQiOjE1OTQxMjIyODl9.Pjp_cIxsBZj6YcyWEHr0Vp0Ijp16JDr0uHHjVLa_xTU
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOiI1ZjBhMDA3YmIzYTA1MzRlMzhmYTA0MzQiLCJpYXQiOjE1OTQ1Mzg2ODZ9.Mvzk055f_6No9lFVIMiyi-lRc5xKmTMNpEZ17cHmRAU
 
 {
     "title": "Tracing user interactions with React",
